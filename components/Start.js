@@ -1,23 +1,34 @@
 import React from 'react';
-import { StyleSheet, View, Text, Button, TextInput, ImageBackground, Image, TouchableOpacity } from 'react-native';
-
+import { StyleSheet, View, Text, Button, TextInput, ImageBackground, Image, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import Icon from '../assets/CF/icon.svg';
 export default class Start extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: ''
+      username: '',
+      backgroundColor: color1,
+      activeColor: 1
     };
   }
 
+  chooseBackgroundColor(color, num) {
+    this.setState({
+      backgroundColor: color,
+      activeColor: num
+    });
+  }
+
   render() {
+    const { activeColor } = this.state;
     return (
       <View style={s.view}>
         <ImageBackground source={require('../assets/CF/Background-Image.png')} resizeMode='cover' style={s.image}>
           <Text style={s.title}>Let's Talk</Text>
 
           <View style={s.inputBox}>
+
             <View style={s.textInput}>
-              <Image source={require('../assets/CF/icon.svg')} style={s.textInputIcon}/>
+              <Icon style={s.textInputIcon}/>
               <TextInput style={s.textInputText}
                 onChangeText={(text) => this.setState({ username: text })}
                 placeholder={'Your Name'}
@@ -28,24 +39,24 @@ export default class Start extends React.Component {
             <View style={s.backgroundColorView}>
               <Text style={s.chooseBackgroundColor}>Choose Background Color:</Text>
               <View style={s.colorPalleteWrapper}>
-                <View style={s.colorSwatheWrapper}>
-                  <Text style={[s.colorSwathe, s.color1]}></Text>
+                <View style={[ s.colorSwatheWrapper, (activeColor===1 ? s.colorSwatheSelected : s.colorSwatheNotSelected) ]}>
+                  <Text style={[s.colorSwathe, s.color1]} onPress={() => {this.chooseBackgroundColor(color1, 1)}}></Text>
                 </View>
-                <View style={s.colorSwatheWrapper}>
-                  <Text style={[s.colorSwathe, s.color2]}></Text>
+                <View style={[ s.colorSwatheWrapper, (activeColor===2 ? s.colorSwatheSelected : s.colorSwatheNotSelected) ]}>
+                  <Text style={[s.colorSwathe, s.color2]} onPress={() => {this.chooseBackgroundColor(color2, 2)}}></Text>
                 </View>
-                <View style={[s.colorSwatheWrapper, s.colorSwatheSelected]}>
-                  <Text style={[s.colorSwathe, s.color3]}></Text>
+                <View style={[ s.colorSwatheWrapper, (activeColor===3 ? s.colorSwatheSelected : s.colorSwatheNotSelected) ]}>
+                  <Text style={[s.colorSwathe, s.color3]} onPress={() => {this.chooseBackgroundColor(color3, 3)}}></Text>
                 </View>
-                <View style={s.colorSwatheWrapper}>
-                  <Text style={[s.colorSwathe, s.color4]}></Text>
+                <View style={[ s.colorSwatheWrapper, (activeColor===4 ? s.colorSwatheSelected : s.colorSwatheNotSelected) ]}>
+                  <Text style={[s.colorSwathe, s.color4]} onPress={() => {this.chooseBackgroundColor(color4, 4)}}></Text>
                 </View>
               </View>
             </View>
 
 
             <TouchableOpacity style={s.startChatting}
-              onPress={() => this.props.navigation.navigate('Chat', { username: this.state.username })}>
+              onPress={() => this.props.navigation.navigate('Chat', { username: this.state.username, backgroundColor: this.state.backgroundColor })}>
               <Text style={s.startChattingText}>Start Chatting</Text>
             </TouchableOpacity>
 
@@ -59,6 +70,10 @@ export default class Start extends React.Component {
 
 const lineHeight = 55;
 const circleSize = 40;
+const color1 = '#090C08';
+const color2 = '#474056';
+const color3 = '#8A95A5';
+const color4 = '#B9C6AE';
 
 const s = StyleSheet.create({
   view: {
@@ -84,12 +99,15 @@ const s = StyleSheet.create({
   textInput: {
     width: '100%',
     borderWidth: 1,
+    borderRadius: 2,
     height: lineHeight,
-    justifyContent: 'center'
+    flexDirection: 'row',
+
   },
   textInputIcon: {
-    height: 20,
-    width: 20
+    marginTop: 15,
+    marginLeft: 15,
+    marginRight: 10
   },
   textInputText: {
     fontSize: 16,
@@ -125,17 +143,23 @@ const s = StyleSheet.create({
     borderWidth: 2,
     borderRadius: (circleSize + 8) / 2
   },
+  colorSwatheNotSelected: {
+    padding: 2,
+    borderWidth: 2,
+    borderRadius: (circleSize + 8) / 2,
+    borderColor: 'white'
+  },
   color1: {
-    backgroundColor: '#090C08'
+    backgroundColor: color1
   },
   color2: {
-    backgroundColor: '#474056'
+    backgroundColor: color2
   },
   color3: {
-    backgroundColor: '#8A95A5'
+    backgroundColor: color3
   },
   color4: {
-    backgroundColor: '#B9C6AE'
+    backgroundColor: color4
   },
   startChatting: {
     height: lineHeight,
