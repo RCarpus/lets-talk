@@ -36,3 +36,7 @@ Place this somewhere before the declaration of the app.
 In the render function wrap entire app in `<NavigationContainer>`.  
 Inside the `<NavigationContainer>` create a `<Stack.Navigator initialRouteName="someScreen>`  
 Place routes inside the `<Stack.Navigator>` with `<Stack.Screen name="screenName" component={componentName} />`
+### SVG support
+React-native does not come with support for SVG format images out of the box. I did not want to convert my SVG logo used on the start screen to a support image format because I wanted it to look good on all screen sizes, so I used a library called [react-native-svg](https://github.com/react-native-svg/react-native-svg) which allowed me to directly import my SVG and use it as a component called "Icon" in my app.
+### Chat room implementation
+I used the popular [react-native-gifted-chat](https://github.com/FaridSafi/react-native-gifted-chat) library to implement my chat room. Gifted Chat is a well-supported library that offers a customizable chat UI that is easily understood and used, and very easy to implement.
