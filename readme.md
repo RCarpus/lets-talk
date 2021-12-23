@@ -6,7 +6,7 @@ Download Expo app
 ### Install expo globally
 `npm install expo-cli --global`
 ### Create a new project
-Go to directory where you want the new project.  
+Go to directory where you want the new project. This creates a new folder and puts the project in it.  
 `expo init project-name`
 ### Run project to test while developing
 `expo start`
