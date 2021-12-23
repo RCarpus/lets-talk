@@ -7,12 +7,11 @@ export default class Start extends React.Component {
     super(props);
     this.state = {
       username: '',
-      backgroundColor: color1,
       activeColor: 1
     };
   }
 
-  chooseBackgroundColor(color, num) {
+  chooseBackgroundColor(num) {
     /**
      * When you click on a color circle, that color becomes active.
      * It gets a black border, and the previously active color loses its black border.
@@ -20,7 +19,6 @@ export default class Start extends React.Component {
      * Also sets the backgroundcolor in state to that color.
      */
     this.setState({
-      backgroundColor: color,
       activeColor: num
     });
   }
@@ -54,16 +52,16 @@ export default class Start extends React.Component {
               <View style={s.colorPalleteWrapper}> 
                 {/* For each color swathe, use a black border when the color is active. Clicking the button makes it active */}
                 <View style={[s.colorSwatheWrapper, (activeColor === 1 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color1]} onPress={() => { this.chooseBackgroundColor(color1, 1) }}></Text>
+                  <Text style={[s.colorSwathe, s.color1]} onPress={() => { this.chooseBackgroundColor(1) }}></Text>
                 </View>
                 <View style={[s.colorSwatheWrapper, (activeColor === 2 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color2]} onPress={() => { this.chooseBackgroundColor(color2, 2) }}></Text>
+                  <Text style={[s.colorSwathe, s.color2]} onPress={() => { this.chooseBackgroundColor(2) }}></Text>
                 </View>
                 <View style={[s.colorSwatheWrapper, (activeColor === 3 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color3]} onPress={() => { this.chooseBackgroundColor(color3, 3) }}></Text>
+                  <Text style={[s.colorSwathe, s.color3]} onPress={() => { this.chooseBackgroundColor(3) }}></Text>
                 </View>
                 <View style={[s.colorSwatheWrapper, (activeColor === 4 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color4]} onPress={() => { this.chooseBackgroundColor(color4, 4) }}></Text>
+                  <Text style={[s.colorSwathe, s.color4]} onPress={() => { this.chooseBackgroundColor(4) }}></Text>
                 </View>
               </View>
             </View>
@@ -71,7 +69,7 @@ export default class Start extends React.Component {
             {/* CHILD 3 */}
             {/* Navigate to chat screen. Send username and background as props to be handled in the chat screen */}
             <TouchableOpacity style={s.startChatting}
-              onPress={() => this.props.navigation.navigate('Chat', { username: this.state.username, backgroundColor: this.state.backgroundColor })}>
+              onPress={() => this.props.navigation.navigate('Chat', { username: this.state.username, activeColor: this.state.activeColor })}>
               <Text style={s.startChattingText}>Start Chatting</Text>
             </TouchableOpacity>
 
