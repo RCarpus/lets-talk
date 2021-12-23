@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { Bubble, GiftedChat } from 'react-native-gifted-chat';
 
 export default class Chat extends React.Component {
   constructor() {
     super();
     this.state = {
-      message: [],
+      messages: [],
     }
   }
 
   componentDidMount() {
     this.setState({
-      message: [
+      messages: [
         {
           _id: 1,
           text: 'Hello developer',
@@ -28,6 +28,12 @@ export default class Chat extends React.Component {
           received: true,
           pending: true,
         },
+        {
+          _id: 2,
+          text: 'This is a system message',
+          createdAt: new Date(),
+          system: true,
+        }
       ],
     })
   }
@@ -38,21 +44,43 @@ export default class Chat extends React.Component {
     }))
   }
 
+  renderBubble(props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: '#000'
+          }
+        }}
+      />
+    )
+  }
+
   render() {
     const { username, backgroundColor } = this.props.route.params;
 
     this.props.navigation.setOptions({ title: username });
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: backgroundColor }}>
-        <Text>helo</Text>
-        {/* <GiftedChat
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
             _id: 1,
           }}
-        /> */}
+        />
+        {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
       </View>
+
     )
   }
 }
+
+const s = StyleSheet.create({
+  giftedChat: {
+    // width: '100%',
+    // height: '100%'
+  }
+})
