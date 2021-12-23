@@ -2,7 +2,60 @@ import React from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
+//FIREBASE
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, QuerySnapshot } from 'firebase/firestore/lite';
 
+const firebaseConfig = {
+  apiKey: "AIzaSyAmUJJ5LxuLdfj7lv5V37Nl5BNtvNNh_Fs",
+  authDomain: "let-s-talk-c2689.firebaseapp.com",
+  projectId: "let-s-talk-c2689",
+  storageBucket: "let-s-talk-c2689.appspot.com",
+  messagingSenderId: "1049025459242",
+  appId: "1:1049025459242:web:da0ba4e84edff497963f53",
+  measurementId: "G-XBG0EDEC6C"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Create a reference to my messages collection
+// const messagesCollection = collection(db, 'messages');
+
+// Get all messages from database
+// PROBABLY CAND ELETE
+async function getMessages(db) {
+  const messagesCol = collection(db, 'messages');
+  const messagesSnapshot = await getDocs(messagesCol);
+  const messagesList = messagesSnapshot.docs.map(doc => doc.data());
+  console.log(messagesList);
+  return messagesList;
+}
+
+
+const dummyMessages = [
+  {
+    _id: 1,
+    text: 'Hello developer',
+    createdAt: new Date(),
+    user: {
+      _id: 2,
+      name: 'React Native',
+      avatar: 'https://placeimg.com/140/140/any',
+    },
+    image: null,
+    video: null,
+    sent: true,
+    received: true,
+    pending: true,
+  },
+  {
+    _id: 2,
+    text: `bumbum has entered the chat`,
+    createdAt: new Date(),
+    system: true,
+  }
+];
 
 export default class Chat extends React.Component {
   constructor() {
@@ -12,34 +65,35 @@ export default class Chat extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.setState({
-      // Dummy message data
-      messages: [
-        {
-          _id: 1,
-          text: 'Hello developer',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-          image: null,
-          video: null,
-          sent: true,
-          received: true,
-          pending: true,
-        },
-        {
-          _id: 2,
-          text: `${this.props.route.params.username} has entered the chat`,
-          createdAt: new Date(),
-          system: true,
-        }
-      ],
-    })
+
+
+  componentDidMount(){
+    this.referenceMessages = collection(db, 'messages');
+    const querySnapshot = getDocs(collection(db, 'messages'));
+    // this.unsubscribe = this.referenceMessages.onSnapshot(this.onCollectionUpdate);
   }
+
+  componentWillUnmount() {
+    // this.unsubscribe();
+  }
+
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    // go through each doc
+    QuerySnapshot.forEach((doc) => {
+      // get the data
+      var data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text,
+        createdAt: data.createdAt,
+        user: data.user,
+      });
+    });
+    this.setState({
+      messages,
+    });
+  };
 
   onSend(messages = []) {
     this.setState(previousState => ({
@@ -112,6 +166,7 @@ export default class Chat extends React.Component {
 
   render() {
     const { username, activeColor } = this.props.route.params;
+    console.log(this.state);
 
     this.props.navigation.setOptions({ title: username });
     return (
