@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Text, Button, TextInput, ImageBackground, Image, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Text, Button, TextInput, ImageBackground,
+   TouchableOpacity } from 'react-native';
 import Icon from '../assets/CF/icon.svg';
 export default class Start extends React.Component {
   constructor(props) {
