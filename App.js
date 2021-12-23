@@ -11,7 +11,7 @@ import Chat from './components/Chat';
 // Create the navigator
 const Stack = createStackNavigator();
 
-export default class Butt extends React.Component {
+export default class App extends React.Component {
   render() {
     return (
       <NavigationContainer>
