@@ -49,7 +49,8 @@ export default class Start extends React.Component {
             {/* CHILD 2 */}
             <View style={s.backgroundColorView}>
               <Text style={s.chooseBackgroundColor}>Choose Background Color:</Text>
-              <View style={s.colorPalleteWrapper}> {/* This is used as a horizontal flex wrapper */}
+              {/* This is used as a horizontal flex wrapper */}
+              <View style={s.colorPalleteWrapper}> 
                 {/* For each color swathe, use a black border when the color is active. Clicking the button makes it active */}
                 <View style={[s.colorSwatheWrapper, (activeColor === 1 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
                   <Text style={[s.colorSwathe, s.color1]} onPress={() => { this.chooseBackgroundColor(color1, 1) }}></Text>
