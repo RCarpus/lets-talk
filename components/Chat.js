@@ -2,36 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
+
 //FIREBASE
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, QuerySnapshot } from 'firebase/firestore/lite';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAmUJJ5LxuLdfj7lv5V37Nl5BNtvNNh_Fs",
-  authDomain: "let-s-talk-c2689.firebaseapp.com",
-  projectId: "let-s-talk-c2689",
-  storageBucket: "let-s-talk-c2689.appspot.com",
-  messagingSenderId: "1049025459242",
-  appId: "1:1049025459242:web:da0ba4e84edff497963f53",
-  measurementId: "G-XBG0EDEC6C"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// Create a reference to my messages collection
-// const messagesCollection = collection(db, 'messages');
-
-// Get all messages from database
-// PROBABLY CAND ELETE
-async function getMessages(db) {
-  const messagesCol = collection(db, 'messages');
-  const messagesSnapshot = await getDocs(messagesCol);
-  const messagesList = messagesSnapshot.docs.map(doc => doc.data());
-  console.log(messagesList);
-  return messagesList;
-}
-
+import firebase from 'firebase';
+import 'firebase/firestore';
 
 const dummyMessages = [
   {
@@ -60,33 +34,45 @@ const dummyMessages = [
 export default class Chat extends React.Component {
   constructor() {
     super();
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmUJJ5LxuLdfj7lv5V37Nl5BNtvNNh_Fs",
+      authDomain: "let-s-talk-c2689.firebaseapp.com",
+      projectId: "let-s-talk-c2689",
+      storageBucket: "let-s-talk-c2689.appspot.com",
+      messagingSenderId: "1049025459242",
+      appId: "1:1049025459242:web:da0ba4e84edff497963f53",
+      measurementId: "G-XBG0EDEC6C"
+    };
+    
     this.state = {
       messages: [],
     }
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    this.referenceMessages = firebase.firestore().collection('messages');
   }
 
-
-
   componentDidMount(){
-    this.referenceMessages = collection(db, 'messages');
-    const querySnapshot = getDocs(collection(db, 'messages'));
-    // this.unsubscribe = this.referenceMessages.onSnapshot(this.onCollectionUpdate);
+    this.referenceMessages = firebase.firestore().collection('messages');
+    this.unsubscribe = this.referenceMessages.orderBy('createdAt', 'desc').onSnapshot(this.onCollectionUpdate);
   }
 
   componentWillUnmount() {
-    // this.unsubscribe();
+    this.unsubscribe();
   }
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // go through each doc
-    QuerySnapshot.forEach((doc) => {
+    querySnapshot.forEach((doc) => {
       // get the data
       var data = doc.data();
       messages.push({
         _id: data._id,
         text: data.text,
-        createdAt: data.createdAt,
+        createdAt: data.createdAt.toDate(),
         user: data.user,
       });
     });
@@ -95,10 +81,22 @@ export default class Chat extends React.Component {
     });
   };
 
+  addMessage() {
+    const messageToAdd = this.state.messages[0];
+    this.referenceMessages.add({
+      _id: messageToAdd._id,
+      text: messageToAdd.text,
+      createdAt: messageToAdd.createdAt,
+      user: this.props.route.params.username,
+    });
+  }
+
   onSend(messages = []) {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
-    }))
+    }), () => {
+      this.addMessage();
+    })
   }
 
   renderBubble(props) {
