@@ -34,6 +34,7 @@ const dummyMessages = [
 export default class Chat extends React.Component {
   constructor() {
     super();
+    // These are my unique credentials from my firestore console
     const firebaseConfig = {
       apiKey: "AIzaSyAmUJJ5LxuLdfj7lv5V37Nl5BNtvNNh_Fs",
       authDomain: "let-s-talk-c2689.firebaseapp.com",
@@ -46,24 +47,42 @@ export default class Chat extends React.Component {
     
     this.state = {
       messages: [],
+      uid: null,
     }
-
+    //connects to the database
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
+    // creates a reference to my collection
     this.referenceMessages = firebase.firestore().collection('messages');
   }
 
-  componentDidMount(){
-    this.referenceMessages = firebase.firestore().collection('messages');
-    this.unsubscribe = this.referenceMessages.orderBy('createdAt', 'desc').onSnapshot(this.onCollectionUpdate);
+  componentDidMount() {
+    // signs the user in anonymously and loads in messages from database
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        firebase.auth().signInAnonymously();
+      }
+      this.setState({
+        uid: user.uid,
+        messages: [],
+      });
+      this.unsubscribe = this.referenceMessages
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
+    });
   }
 
   componentWillUnmount() {
+    // close connections when we close the app
     this.unsubscribe();
+    this.authUnsubscribe();
   }
 
   onCollectionUpdate = (querySnapshot) => {
+    /**
+     * Whenever the collection updates, rewrite the new collection to state.
+     */
     const messages = [];
     // go through each doc
     querySnapshot.forEach((doc) => {
@@ -74,29 +93,41 @@ export default class Chat extends React.Component {
         text: data.text,
         createdAt: data.createdAt.toDate(),
         user: data.user,
+        uid: this.state.uid
       });
     });
     this.setState({
-      messages,
+      messages
     });
   };
 
   addMessage() {
+    // send a new message to the server
+    // the first message in our list is the new one
     const messageToAdd = this.state.messages[0];
     this.referenceMessages.add({
       _id: messageToAdd._id,
       text: messageToAdd.text,
       createdAt: messageToAdd.createdAt,
-      user: this.props.route.params.username,
+      user: {
+        _id: this.state.uid,
+        name: this.props.route.params.username,
+        avatar: 'https://placeimg.com/140/140/any'
+      },
+      uid: this.state.uid
     });
   }
 
   onSend(messages = []) {
+    /**
+     * take the new message, add the old messages to it, and set it to state
+     * Then add the message to the database
+     */
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }), () => {
       this.addMessage();
-    })
+    }) 
   }
 
   renderBubble(props) {
@@ -164,7 +195,6 @@ export default class Chat extends React.Component {
 
   render() {
     const { username, activeColor } = this.props.route.params;
-    console.log(this.state);
 
     this.props.navigation.setOptions({ title: username });
     return (
@@ -174,10 +204,13 @@ export default class Chat extends React.Component {
           renderSystemMessage={this.renderSystemMessage.bind(this)}
           renderDay={this.renderDay.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          renderUsernameOnMessage={true}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
-            _id: 1,
+            _id: this.state.uid,
+            name: username,
+            avatar: 'https://placeimg.com/140/140/any'
           }}
         />
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
