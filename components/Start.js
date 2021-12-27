@@ -1,4 +1,5 @@
 import React from 'react';
+// import AsyncStorage from '@react-native-community/async-storage';
 import {
   StyleSheet, View, Text, Button, TextInput, ImageBackground,
   TouchableOpacity

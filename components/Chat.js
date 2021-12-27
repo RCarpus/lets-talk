@@ -1,4 +1,5 @@
 import React from 'react';
+// import AsyncStorage from '@react-native-community/async-storage';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
