@@ -9,30 +9,6 @@ import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-nati
 import firebase from 'firebase';
 import 'firebase/firestore';
 
-const dummyMessages = [
-  {
-    _id: 1,
-    text: 'Hello developer',
-    createdAt: new Date(),
-    user: {
-      _id: 2,
-      name: 'React Native',
-      avatar: 'https://placeimg.com/140/140/any',
-    },
-    image: null,
-    video: null,
-    sent: true,
-    received: true,
-    pending: true,
-  },
-  {
-    _id: 2,
-    text: `bumbum has entered the chat`,
-    createdAt: new Date(),
-    system: true,
-  }
-];
-
 export default class Chat extends React.Component {
   constructor() {
     super();
@@ -123,7 +99,8 @@ export default class Chat extends React.Component {
 
   async deleteMessages() {
     /**
-     * Deletes the messages stored in AsyncStorage
+     * Deletes the messages stored in AsyncStorage. 
+     * This is not called anywhere in the app, and is for debugging only
      */
     try {
       await AsyncStorage.removeItem('messages');
@@ -153,8 +130,7 @@ export default class Chat extends React.Component {
             messages: [],
             isConnected: true,
           });
-          // Save the uid to AsyncStorage so we can still know which messages are ours when offline
-          this.saveUid();
+          this.saveUid(); // Save the uid to AsyncStorage so we can still know which messages are ours when offline
           this.unsubscribe = this.referenceMessages
             .orderBy("createdAt", "desc")
             .onSnapshot(this.onCollectionUpdate);
