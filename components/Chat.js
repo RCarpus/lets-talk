@@ -1,5 +1,5 @@
 import React from 'react';
-// import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
@@ -58,8 +58,56 @@ export default class Chat extends React.Component {
     this.referenceMessages = firebase.firestore().collection('messages');
   }
 
+  async getMessages () {
+     /**
+      * When we load the app, we want to load the messages saved in AsyncStorage.
+      * This will allow us to view messages while offline and to give users the impression
+      * that the application loads faster.
+      * This function is called from componentDidMount
+      */
+    console.log('getMessages');
+    let messages = '';
+    try {
+      messages = await AsyncStorage.getItem('messages') || [];
+      this.setState({
+        messages: JSON.parse(messages)
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  async saveMessages () {
+    /**
+     * save the messages to AsyncStorage.
+     * This is done every time we add a new message to the server,
+     * so our saved messages should line up with the database.
+     */
+    try {
+      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async deleteMessages () {
+    /**
+     * Deletes the messages stored in AsyncStorage
+     */
+    try {
+      await AsyncStorage.removeItem('messages');
+      this.setState({
+        messages: []
+      })
+    } catch (error) {
+      console.log(error.message);
+    }
+    
+  }
+
   componentDidMount() {
     // signs the user in anonymously and loads in messages from database
+    this.getMessages();
     this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         firebase.auth().signInAnonymously();
@@ -122,12 +170,14 @@ export default class Chat extends React.Component {
   onSend(messages = []) {
     /**
      * take the new message, add the old messages to it, and set it to state
-     * Then add the message to the database
+     * Then add the message to the database.
+     * We also save the messages to AsyncStorage for offline use.
      */
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }), () => {
       this.addMessage();
+      this.saveMessages();
     }) 
   }
 
