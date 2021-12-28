@@ -77,6 +77,24 @@ export default class Chat extends React.Component {
     }
   };
 
+  async getUid() {
+    /**
+    * When we load the app, we first want to load uid from database.
+    * BUT if offline, this will allow us to have our uid while offline
+    * This function is called from componentDidMount
+    */
+    console.log('getUid');
+    let uid = '';
+    try {
+      uid = await AsyncStorage.getItem('uid') || [];
+      this.setState({
+        uid
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   async saveMessages() {
     /**
      * save the messages to AsyncStorage.
@@ -85,6 +103,19 @@ export default class Chat extends React.Component {
      */
     try {
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async saveUid() {
+    /**
+    * save the uid to AsyncStorage.
+    * This is done every time we sign in to the server,
+    * so our uid should line up with the database.
+    */
+    try {
+      await AsyncStorage.setItem('uid', this.state.uid);
     } catch (error) {
       console.log(error.message);
     }
@@ -122,12 +153,15 @@ export default class Chat extends React.Component {
             messages: [],
             isConnected: true,
           });
+          // Save the uid to AsyncStorage so we can still know which messages are ours when offline
+          this.saveUid();
           this.unsubscribe = this.referenceMessages
             .orderBy("createdAt", "desc")
             .onSnapshot(this.onCollectionUpdate);
         });
       } else {
         this.getMessages();
+        this.getUid();
         this.setState({
           isConnected: false,
         })
@@ -139,8 +173,10 @@ export default class Chat extends React.Component {
 
   componentWillUnmount() {
     // close connections when we close the app
-    this.unsubscribe();
-    this.authUnsubscribe();
+    if (this.state.isConnected) {
+      this.unsubscribe();
+      this.authUnsubscribe();
+    }
   }
 
   onCollectionUpdate = (querySnapshot) => {
