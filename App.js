@@ -8,6 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Importing my screens
 import Start from './components/Start';
 import Chat from './components/Chat';
+import CustomActions from './components/CustomActions';
 // Create the navigator
 const Stack = createStackNavigator();
 
