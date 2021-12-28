@@ -1,5 +1,6 @@
 import React from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
@@ -45,7 +46,7 @@ export default class Chat extends React.Component {
       appId: "1:1049025459242:web:da0ba4e84edff497963f53",
       measurementId: "G-XBG0EDEC6C"
     };
-    
+
     this.state = {
       messages: [],
       uid: null,
@@ -58,13 +59,12 @@ export default class Chat extends React.Component {
     this.referenceMessages = firebase.firestore().collection('messages');
   }
 
-  async getMessages () {
-     /**
-      * When we load the app, we want to load the messages saved in AsyncStorage.
-      * This will allow us to view messages while offline and to give users the impression
-      * that the application loads faster.
-      * This function is called from componentDidMount
-      */
+  async getMessages() {
+    /**
+     * When we load the app, we first want to load messages from database.
+     * BUT if offline, this will allow us to view messages while offline 
+     * This function is called from componentDidMount
+     */
     console.log('getMessages');
     let messages = '';
     try {
@@ -77,7 +77,7 @@ export default class Chat extends React.Component {
     }
   };
 
-  async saveMessages () {
+  async saveMessages() {
     /**
      * save the messages to AsyncStorage.
      * This is done every time we add a new message to the server,
@@ -90,7 +90,7 @@ export default class Chat extends React.Component {
     }
   }
 
-  async deleteMessages () {
+  async deleteMessages() {
     /**
      * Deletes the messages stored in AsyncStorage
      */
@@ -102,24 +102,39 @@ export default class Chat extends React.Component {
     } catch (error) {
       console.log(error.message);
     }
-    
+
   }
 
   componentDidMount() {
-    // signs the user in anonymously and loads in messages from database
-    this.getMessages();
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      if (!user) {
-        firebase.auth().signInAnonymously();
+    /**
+     * First checks to see if the user is online. If they are, sign in to the database
+     * and load messages from the database.
+     * If the user is offline, they will load messages from AsyncStorage and will not have online features
+     */
+    NetInfo.fetch().then(connection => {
+      if (connection.isConnected) {
+        this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          if (!user) {
+            firebase.auth().signInAnonymously();
+          }
+          this.setState({
+            uid: user.uid,
+            messages: [],
+            isConnected: true,
+          });
+          this.unsubscribe = this.referenceMessages
+            .orderBy("createdAt", "desc")
+            .onSnapshot(this.onCollectionUpdate);
+        });
+      } else {
+        this.getMessages();
+        this.setState({
+          isConnected: false,
+        })
       }
-      this.setState({
-        uid: user.uid,
-        messages: [],
-      });
-      this.unsubscribe = this.referenceMessages
-        .orderBy("createdAt", "desc")
-        .onSnapshot(this.onCollectionUpdate);
-    });
+
+    })
+
   }
 
   componentWillUnmount() {
@@ -178,7 +193,7 @@ export default class Chat extends React.Component {
     }), () => {
       this.addMessage();
       this.saveMessages();
-    }) 
+    })
   }
 
   renderBubble(props) {
@@ -234,14 +249,19 @@ export default class Chat extends React.Component {
   renderInputToolbar(props) {
     /**
      * Renders custom color scheme for input toolbar
+     * Also, only renders the toolbar when the user is online
      */
-    return (
-      <InputToolbar {...props}
-        primaryStyle={{
-          backgroundColor: colorSchemes[this.props.route.params.activeColor - 1].typeMessageBar
-        }}
-      />
-    )
+    if (this.state.isConnected == false) {
+    } else {
+      return (
+        <InputToolbar {...props}
+          primaryStyle={{
+            backgroundColor: colorSchemes[this.props.route.params.activeColor - 1].typeMessageBar
+          }}
+        />
+      )
+    }
+
   }
 
   render() {
