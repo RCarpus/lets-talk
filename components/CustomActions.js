@@ -147,7 +147,11 @@ export default class CustomActions extends react.Component {
     // console.log(Object.keys( this.props));
     // console.log(this.props.handleImagePicked);
     return (
-      <TouchableOpacity style={s.customActionsButton} onPress={this.onActionPress}>
+      <TouchableOpacity style={s.customActionsButton} onPress={this.onActionPress}
+      accessibilityRole='button'
+      accessibilityHint='expands a menu to let you take a picture, share a picture, or share your location'
+      accessibilityLabel='additional options'
+      >
 
         <View style={[s.customActionsButtonIconWrapper, this.props.wrapperStyle]}>
           <Text style={[s.customActionsButtonIcon, this.props.iconTextStyle]}>+</Text>
