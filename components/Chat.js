@@ -4,6 +4,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
 
+import CustomActions from './CustomActions';
+
+import MapView from 'react-native-maps';
+
 
 //FIREBASE
 import firebase from 'firebase';
@@ -26,6 +30,7 @@ export default class Chat extends React.Component {
     this.state = {
       messages: [],
       uid: null,
+      image: null,
     }
     //connects to the database
     if (!firebase.apps.length) {
@@ -169,7 +174,9 @@ export default class Chat extends React.Component {
         text: data.text,
         createdAt: data.createdAt.toDate(),
         user: data.user,
-        uid: this.state.uid
+        uid: this.state.uid,
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -183,14 +190,16 @@ export default class Chat extends React.Component {
     const messageToAdd = this.state.messages[0];
     this.referenceMessages.add({
       _id: messageToAdd._id,
-      text: messageToAdd.text,
+      text: messageToAdd.text || '',
       createdAt: messageToAdd.createdAt,
       user: {
         _id: this.state.uid,
         name: this.props.route.params.username,
         avatar: 'https://placeimg.com/140/140/any'
       },
-      uid: this.state.uid
+      uid: this.state.uid,
+      location: messageToAdd.location || null,
+      image: messageToAdd.image || null,
     });
   }
 
@@ -276,6 +285,43 @@ export default class Chat extends React.Component {
 
   }
 
+  renderCustomActions(props) {
+    /**
+     * Render a button to allow users to select custom actions.
+     * When button is pressed, a selector appears with the options
+     * Choose photo, take photo, share location, cancel
+     */
+    return <CustomActions {...props}  />
+  }
+
+  renderCustomView(props) {
+    /**
+     * Render a map view if the message contains location data.
+     * Location data in a message object takes the form of:
+     * { latitude, longitude }
+     */
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{
+            width: 150,
+            height: 100,
+            borderRadius: 13,
+            margin: 3
+          }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
   render() {
     const { username, activeColor } = this.props.route.params;
 
@@ -288,6 +334,8 @@ export default class Chat extends React.Component {
           renderDay={this.renderDay.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderUsernameOnMessage={true}
+          renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
