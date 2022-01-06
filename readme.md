@@ -7,7 +7,7 @@ Let's Talk is a chat app for mobile devices using React Native that provides use
 - Download the Expo Go mobile app and sign in with your Expo account.
 - Download the code as a zip file.
 - unzip the folder, and the terminal, navigate the the root folder, which will be called lets-talk-master.
-- From the root directory, download the project dependencies with `npm init`.
+- From the root directory, download the project dependencies with `npm install`.
 - Run `npm run start` to start Expo.
 - After the Expo server is running, it will give you several connection options to use the app. The most convenient is the QR code. If it does not display, try pressing '?' to load all options, then press 'c' to show the QR code.
 - Within Expo Go, use the "Scan QR Code" tool to scan the QR code displayed by the Expo server.
