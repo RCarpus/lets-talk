@@ -1,13 +1,21 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { Bubble, GiftedChat, SystemMessage, Day, InputToolbar } from 'react-native-gifted-chat';
-
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+import {
+  Bubble,
+  GiftedChat,
+  SystemMessage,
+  Day,
+  InputToolbar
+} from 'react-native-gifted-chat';
 import CustomActions from './CustomActions';
-
 import MapView from 'react-native-maps';
-
 
 //FIREBASE
 import firebase from 'firebase';
@@ -83,7 +91,8 @@ export default class Chat extends React.Component {
      * so our saved messages should line up with the database.
      */
     try {
-      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+      await AsyncStorage.setItem('messages',
+        JSON.stringify(this.state.messages));
     } catch (error) {
       console.log(error.message);
     }
@@ -120,9 +129,10 @@ export default class Chat extends React.Component {
 
   componentDidMount() {
     /**
-     * First checks to see if the user is online. If they are, sign in to the database
-     * and load messages from the database.
-     * If the user is offline, they will load messages from AsyncStorage and will not have online features
+     * First checks to see if the user is online. If they are, sign in to
+     * the database and load messages from the database. If the user is 
+     * offline, they will load messages from AsyncStorage and will not 
+     * have online features.
      */
     NetInfo.fetch().then(connection => {
       if (connection.isConnected) {
@@ -135,7 +145,9 @@ export default class Chat extends React.Component {
             messages: [],
             isConnected: true,
           });
-          this.saveUid(); // Save the uid to AsyncStorage so we can still know which messages are ours when offline
+          // Save the uid to AsyncStorage so we can still know which messages 
+          // are ours when offline.
+          this.saveUid();
           this.unsubscribe = this.referenceMessages
             .orderBy("createdAt", "desc")
             .onSnapshot(this.onCollectionUpdate);
@@ -221,23 +233,24 @@ export default class Chat extends React.Component {
     /**
      * Renders custom color scheme for text bubbles
      */
+    const scheme = this.props.route.params.activeColor - 1;
     return (
       <Bubble
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: colorSchemes[this.props.route.params.activeColor - 1].sentMessageBubble
+            backgroundColor: colorSchemes[scheme].sentMessageBubble
           },
           left: {
-            backgroundColor: colorSchemes[this.props.route.params.activeColor - 1].receivedMessageBubble,
+            backgroundColor: colorSchemes[scheme].receivedMessageBubble,
           }
         }}
         textStyle={{
           left: {
-            color: colorSchemes[this.props.route.params.activeColor - 1].receivedMessageText
+            color: colorSchemes[scheme].receivedMessageText
           },
           right: {
-            color: colorSchemes[this.props.route.params.activeColor - 1].sentMessageText
+            color: colorSchemes[scheme].sentMessageText
           }
         }}
       />
@@ -248,11 +261,12 @@ export default class Chat extends React.Component {
     /**
      * Renders custom color scheme for system message
      */
+    const scheme = this.props.route.params.activeColor - 1;
     return (
       <SystemMessage
         {...props}
         textStyle={{
-          color: colorSchemes[this.props.route.params.activeColor - 1].systemText
+          color: colorSchemes[scheme].systemText
         }}
       />
     )
@@ -262,8 +276,9 @@ export default class Chat extends React.Component {
     /**
      * Renders custom color scheme for date
      */
+    const scheme = this.props.route.params.activeColor - 1;
     return (
-      <Day {...props} textStyle={{ color: colorSchemes[this.props.route.params.activeColor - 1].systemText }} />
+      <Day {...props} textStyle={{ color: colorSchemes[scheme].systemText }} />
     )
   }
 
@@ -272,14 +287,13 @@ export default class Chat extends React.Component {
      * Renders custom color scheme for input toolbar
      * Also, only renders the toolbar when the user is online
      */
-    if (this.state.isConnected == false) {
-    } else {
+    const scheme = this.props.route.params.activeColor - 1;
+    if (this.state.isConnected) {
       return (
         <InputToolbar {...props}
           primaryStyle={{
-            backgroundColor: colorSchemes[this.props.route.params.activeColor - 1].typeMessageBar
-          }}
-        />
+            backgroundColor: colorSchemes[scheme].typeMessageBar
+          }} />
       )
     }
 
@@ -291,7 +305,7 @@ export default class Chat extends React.Component {
      * When button is pressed, a selector appears with the options
      * Choose photo, take photo, share location, cancel
      */
-    return <CustomActions {...props}  />
+    return <CustomActions {...props} />
   }
 
   renderCustomView(props) {
@@ -324,10 +338,14 @@ export default class Chat extends React.Component {
 
   render() {
     const { username, activeColor } = this.props.route.params;
+    const scheme = this.props.route.params.activeColor - 1;
 
     this.props.navigation.setOptions({ title: username });
     return (
-      <View style={{ flex: 1, backgroundColor: colorSchemes[activeColor - 1].background }}>
+      <View style={{
+        flex: 1,
+        backgroundColor: colorSchemes[scheme].background
+      }}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           renderSystemMessage={this.renderSystemMessage.bind(this)}
@@ -344,7 +362,9 @@ export default class Chat extends React.Component {
             avatar: 'https://placeimg.com/140/140/any'
           }}
         />
-        {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
+        {Platform.OS === 'android'
+          ? <KeyboardAvoidingView behavior='height' />
+          : null}
       </View>
 
     )
@@ -353,7 +373,7 @@ export default class Chat extends React.Component {
 
 const colorSchemes = [
   /**
-   * Custom color schemes selected by clicking a background color in Start screen
+   * Custom color schemes selected by clicking background color in Start screen
    */
   {
     background: '#090C08',
