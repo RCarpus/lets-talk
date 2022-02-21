@@ -1,8 +1,12 @@
 import React from 'react';
 // import AsyncStorage from '@react-native-community/async-storage';
 import {
-  StyleSheet, View, Text, Button, TextInput, ImageBackground,
-  TouchableOpacity
+  StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  ImageBackground,
+  TouchableOpacity, 
 } from 'react-native';
 import Icon from '../assets/CF/icon.svg';
 export default class Start extends React.Component {
@@ -145,6 +149,7 @@ const s = StyleSheet.create({
   inputBox: {
     width: '88%', // SPEC
     height: '44%', // SPEC
+    minHeight: 300,
     alignItems: 'center',
     padding: '6%', // SPEC
     backgroundColor: 'white', // SPEC
