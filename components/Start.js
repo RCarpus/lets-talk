@@ -17,8 +17,8 @@ export default class Start extends React.Component {
   chooseBackgroundColor(num) {
     /**
      * When you click on a color circle, that color becomes active.
-     * It gets a black border, and the previously active color loses its black border.
-     * In reality the border just becomes white.
+     * It gets a black border, and the previously active color loses
+     * its black border. In reality the border just becomes white.
      * Also sets the backgroundcolor in state to that color.
      */
     this.setState({
@@ -31,7 +31,8 @@ export default class Start extends React.Component {
     return (
       <View style={s.view}>
         {/* The ImageBackground contains TWO child views */}
-        <ImageBackground source={require('../assets/CF/Background-Image.png')} resizeMode='cover' style={s.image}>
+        <ImageBackground source={require('../assets/CF/Background-Image.png')}
+          resizeMode='cover' style={s.image}>
           {/* First child of ImageBackground */}
           <Text style={s.title}>Let's Talk</Text>
 
@@ -50,31 +51,50 @@ export default class Start extends React.Component {
 
             {/* CHILD 2 */}
             <View style={s.backgroundColorView}>
-              <Text style={s.chooseBackgroundColor}>Choose Background Color:</Text>
+              <Text style={s.chooseBackgroundColor}>
+                Choose Background Color:
+              </Text>
               {/* This is used as a horizontal flex wrapper */}
               <View style={s.colorPalleteWrapper}>
-                {/* For each color swathe, use a black border when the color is active. Clicking the button makes it active */}
-                <View style={[s.colorSwatheWrapper, (activeColor === 1 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}
+                {/* For each color swathe, use a black border when the color
+                   is active. Clicking the button makes it active */}
+                <View style={[s.colorSwatheWrapper,
+                (activeColor === 1
+                  ? s.colorSwatheSelected
+                  : s.colorSwatheNotSelected)]}
                 >
-                  <Text style={[s.colorSwathe, s.color1]} onPress={() => { this.chooseBackgroundColor(1) }}
+                  <Text style={[s.colorSwathe, s.color1]}
+                    onPress={() => { this.chooseBackgroundColor(1) }}
                     accessible={true} accessibilityLabel="color scheme 1"
                     accessibilityHint="Lets you change the color scheme"
                     accessibilityRole='button'></Text>
                 </View>
-                <View style={[s.colorSwatheWrapper, (activeColor === 2 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color2]} onPress={() => { this.chooseBackgroundColor(2) }}
+                <View style={[s.colorSwatheWrapper,
+                (activeColor === 2
+                  ? s.colorSwatheSelected
+                  : s.colorSwatheNotSelected)]}>
+                  <Text style={[s.colorSwathe, s.color2]}
+                    onPress={() => { this.chooseBackgroundColor(2) }}
                     accessible={true} accessibilityLabel="color scheme 2"
                     accessibilityHint="Lets you change the color scheme"
                     accessibilityRole='button'></Text>
                 </View>
-                <View style={[s.colorSwatheWrapper, (activeColor === 3 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color3]} onPress={() => { this.chooseBackgroundColor(3) }}
+                <View style={[s.colorSwatheWrapper,
+                (activeColor === 3
+                  ? s.colorSwatheSelected
+                  : s.colorSwatheNotSelected)]}>
+                  <Text style={[s.colorSwathe, s.color3]}
+                    onPress={() => { this.chooseBackgroundColor(3) }}
                     accessible={true} accessibilityLabel="color scheme 3"
                     accessibilityHint="Lets you change the color scheme"
                     accessibilityRole='button'></Text>
                 </View>
-                <View style={[s.colorSwatheWrapper, (activeColor === 4 ? s.colorSwatheSelected : s.colorSwatheNotSelected)]}>
-                  <Text style={[s.colorSwathe, s.color4]} onPress={() => { this.chooseBackgroundColor(4) }}
+                <View style={[s.colorSwatheWrapper,
+                (activeColor === 4
+                  ? s.colorSwatheSelected
+                  : s.colorSwatheNotSelected)]}>
+                  <Text style={[s.colorSwathe, s.color4]}
+                    onPress={() => { this.chooseBackgroundColor(4) }}
                     accessible={true} accessibilityLabel="color scheme 4"
                     accessibilityHint="Lets you change the color scheme"
                     accessibilityRole='button'></Text>
@@ -83,9 +103,15 @@ export default class Start extends React.Component {
             </View>
 
             {/* CHILD 3 */}
-            {/* Navigate to chat screen. Send username and background as props to be handled in the chat screen */}
-            <TouchableOpacity style={s.startChatting} accessibilityRole='button'
-              onPress={() => this.props.navigation.navigate('Chat', { username: this.state.username, activeColor: this.state.activeColor })}>
+            {/* Navigate to chat screen. Send username and background as props 
+              to be handled in the chat screen */}
+            <TouchableOpacity style={s.startChatting}
+              accessibilityRole='button'
+              onPress={() => this.props.navigation.navigate('Chat',
+                {
+                  username: this.state.username,
+                  activeColor: this.state.activeColor
+                })}>
               <Text style={s.startChattingText}>Start Chatting</Text>
             </TouchableOpacity>
 
